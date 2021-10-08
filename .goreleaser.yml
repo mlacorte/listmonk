@@ -10,12 +10,7 @@ builds:
   - binary: listmonk
     main: ./cmd
     goos:
-      - windows
-      - darwin
       - linux
-      - freebsd
-      - openbsd
-      - netbsd
     goarch:
       - amd64
     ldflags:
