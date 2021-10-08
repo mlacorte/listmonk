@@ -578,9 +578,9 @@ func (im *Importer) ValidateFields(s SubReq) (SubReq, error) {
 	}
 
 	s.Name = strings.TrimSpace(s.Name)
-	if len(s.Name) == 0 || len(s.Name) > stdInputMaxLen {
-		return s, errors.New(im.i18n.T("subscribers.invalidName"))
-	}
+	// if len(s.Name) == 0 || len(s.Name) > stdInputMaxLen {
+	// 	return s, errors.New(im.i18n.T("subscribers.invalidName"))
+	// }
 
 	em, err := im.SanitizeEmail(s.Email)
 	if err != nil {
