@@ -336,7 +336,7 @@ func handleUpdateSubscriber(c echo.Context) error {
 		req.Email = em
 	}
 
-	if req.Name != "" && !strHasLen(req.Name, 1, stdInputMaxLen) {
+	if !strHasLen(req.Name, 0, stdInputMaxLen) {
 		return echo.NewHTTPError(http.StatusBadRequest, app.i18n.T("subscribers.invalidName"))
 	}
 
