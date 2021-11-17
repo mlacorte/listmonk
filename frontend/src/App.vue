@@ -150,6 +150,10 @@ export default Vue.extend({
 
   watch: {
     $route(to) {
+      if (to.meta.admin && !this.$root.role.admin) {
+        this.$router.replace({ path: '/' });
+      }
+
       // Set the current route name to true for active+expanded keys in the
       // menu to pick up.
       this.activeItem = { [to.name]: true };

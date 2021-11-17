@@ -39,7 +39,9 @@ var (
 
 // registerHandlers registers HTTP handlers.
 func initHTTPHandlers(e *echo.Echo, app *App) {
-	e.Pre(middleware.HTTPSRedirect())
+	if app.constants.ForceSSL {
+		e.Pre(middleware.HTTPSRedirect())
+	}
 
 	// Group of private handlers with BasicAuth.
 	var g *echo.Group
@@ -201,6 +203,8 @@ func basicAuth(username, password string, c echo.Context) (bool, error) {
 		roleCookie := new(http.Cookie)
 		roleCookie.Name = "role"
 		roleCookie.Value = role
+		roleCookie.Path = "/"
+		roleCookie.SameSite = http.SameSiteLaxMode
 		c.SetCookie(roleCookie)
 	}
 

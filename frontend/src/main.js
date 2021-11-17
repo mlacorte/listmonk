@@ -30,7 +30,7 @@ new Vue({
 
   data: {
     isLoaded: false,
-    role: { [this.$cookies.get('role')]: true },
+    role: { [VueCookies.get('role')]: true },
   },
 
   methods: {

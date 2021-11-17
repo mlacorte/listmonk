@@ -20,49 +20,49 @@ const routes = [
   {
     path: '/lists',
     name: 'lists',
-    meta: { title: 'Lists', group: 'lists' },
+    meta: { title: 'Lists', group: 'lists', admin: true },
     component: () => import(/* webpackChunkName: "main" */ '../views/Lists.vue'),
   },
   {
     path: '/lists/forms',
     name: 'forms',
-    meta: { title: 'Forms', group: 'lists' },
+    meta: { title: 'Forms', group: 'lists', admin: true },
     component: () => import(/* webpackChunkName: "main" */ '../views/Forms.vue'),
   },
   {
     path: '/lists/:id',
     name: 'lists',
-    meta: { title: 'Lists', group: 'lists' },
+    meta: { title: 'Lists', group: 'lists', admin: true },
     component: () => import(/* webpackChunkName: "main" */ '../views/Lists.vue'),
   },
   {
     path: '/subscribers',
     name: 'subscribers',
-    meta: { title: 'Subscribers', group: 'subscribers' },
+    meta: { title: 'Subscribers', group: 'subscribers', admin: true },
     component: () => import(/* webpackChunkName: "main" */ '../views/Subscribers.vue'),
   },
   {
     path: '/subscribers/import',
     name: 'import',
-    meta: { title: 'Import subscribers', group: 'subscribers' },
+    meta: { title: 'Import subscribers', group: 'subscribers', admin: true },
     component: () => import(/* webpackChunkName: "main" */ '../views/Import.vue'),
   },
   {
     path: '/subscribers/bounces',
     name: 'bounces',
-    meta: { title: 'Bounces', group: 'subscribers' },
+    meta: { title: 'Bounces', group: 'subscribers', admin: true },
     component: () => import(/* webpackChunkName: "main" */ '../views/Bounces.vue'),
   },
   {
     path: '/subscribers/lists/:listID',
     name: 'subscribers_list',
-    meta: { title: 'Subscribers', group: 'subscribers' },
+    meta: { title: 'Subscribers', group: 'subscribers', admin: true },
     component: () => import(/* webpackChunkName: "main" */ '../views/Subscribers.vue'),
   },
   {
     path: '/subscribers/:id',
     name: 'subscriber',
-    meta: { title: 'Subscribers', group: 'subscribers' },
+    meta: { title: 'Subscribers', group: 'subscribers', admin: true },
     component: () => import(/* webpackChunkName: "main" */ '../views/Subscribers.vue'),
   },
   {
@@ -74,13 +74,13 @@ const routes = [
   {
     path: '/campaigns/media',
     name: 'media',
-    meta: { title: 'Media', group: 'campaigns' },
+    meta: { title: 'Media', group: 'campaigns', admin: true },
     component: () => import(/* webpackChunkName: "main" */ '../views/Media.vue'),
   },
   {
     path: '/campaigns/templates',
     name: 'templates',
-    meta: { title: 'Templates', group: 'campaigns' },
+    meta: { title: 'Templates', group: 'campaigns', admin: true },
     component: () => import(/* webpackChunkName: "main" */ '../views/Templates.vue'),
   },
   {
@@ -98,13 +98,13 @@ const routes = [
   {
     path: '/settings',
     name: 'settings',
-    meta: { title: 'Settings', group: 'settings' },
+    meta: { title: 'Settings', group: 'settings', admin: true },
     component: () => import(/* webpackChunkName: "main" */ '../views/Settings.vue'),
   },
   {
     path: '/settings/logs',
     name: 'logs',
-    meta: { title: 'Logs', group: 'settings' },
+    meta: { title: 'Logs', group: 'settings', admin: true },
     component: () => import(/* webpackChunkName: "main" */ '../views/Logs.vue'),
   },
 ];
