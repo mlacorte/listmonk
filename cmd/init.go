@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -44,6 +45,12 @@ const (
 	adminRoot = "/admin"
 )
 
+type account struct {
+	username []byte
+	password []byte
+	role     string
+}
+
 // constants contains static, constant config values required by the app.
 type constants struct {
 	RootURL               string   `koanf:"root_url"`
@@ -63,8 +70,20 @@ type constants struct {
 		Exportable         map[string]bool `koanf:"-"`
 		DomainBlocklist    map[string]bool `koanf:"-"`
 	} `koanf:"privacy"`
-	AdminUsername []byte `koanf:"admin_username"`
-	AdminPassword []byte `koanf:"admin_password"`
+	AdminUsername   []byte `koanf:"admin_username"`
+	AdminPassword   []byte `koanf:"admin_password"`
+	Editor1Username []byte `koanf:"editor1_username"`
+	Editor1Password []byte `koanf:"editor1_password"`
+	Editor2Username []byte `koanf:"editor2_username"`
+	Editor2Password []byte `koanf:"editor2_password"`
+	Editor3Username []byte `koanf:"editor3_username"`
+	Editor3Password []byte `koanf:"editor3_password"`
+	Editor4Username []byte `koanf:"editor4_username"`
+	Editor4Password []byte `koanf:"editor4_password"`
+	Editor5Username []byte `koanf:"editor5_username"`
+	Editor5Password []byte `koanf:"editor5_password"`
+
+	Accounts map[[32]byte]string
 
 	UnsubURL      string
 	LinkTrackURL  string
@@ -313,6 +332,25 @@ func initConstants() *constants {
 	c.BounceWebhooksEnabled = ko.Bool("bounce.webhooks_enabled")
 	c.BounceSESEnabled = ko.Bool("bounce.ses_enabled")
 	c.BounceSendgridEnabled = ko.Bool("bounce.sendgrid_enabled")
+
+	for _, account := range []account{
+		{username: c.AdminUsername, password: c.AdminPassword, role: "admin"},
+		{username: c.Editor1Username, password: c.Editor1Password, role: "editor"},
+		{username: c.Editor2Username, password: c.Editor2Password, role: "editor"},
+		{username: c.Editor3Username, password: c.Editor3Password, role: "editor"},
+		{username: c.Editor4Username, password: c.Editor4Password, role: "editor"},
+		{username: c.Editor5Username, password: c.Editor5Password, role: "editor"},
+	} {
+		uhash := sha256.Sum256(account.username)
+		phash := sha256.Sum256(account.password)
+
+		hash := make([]byte, 0)
+		hash = append(hash, uhash[:]...)
+		hash = append(hash, phash[:]...)
+
+		c.Accounts[sha256.Sum256(hash)] = account.role
+	}
+
 	return &c
 }
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"crypto/subtle"
+	"crypto/sha256"
 	"net/http"
 	"net/url"
 	"path"
@@ -39,11 +39,12 @@ var (
 
 // registerHandlers registers HTTP handlers.
 func initHTTPHandlers(e *echo.Echo, app *App) {
+	e.Pre(middleware.HTTPSRedirect())
+
 	// Group of private handlers with BasicAuth.
 	var g *echo.Group
 
-	if len(app.constants.AdminUsername) == 0 ||
-		len(app.constants.AdminPassword) == 0 {
+	if len(app.constants.AdminUsername) == 0 {
 		g = e.Group("")
 	} else {
 		g = e.Group("", middleware.BasicAuth(basicAuth))
@@ -186,17 +187,24 @@ func handleHealthCheck(c echo.Context) error {
 func basicAuth(username, password string, c echo.Context) (bool, error) {
 	app := c.Get("app").(*App)
 
-	// Auth is disabled.
-	if len(app.constants.AdminUsername) == 0 &&
-		len(app.constants.AdminPassword) == 0 {
-		return true, nil
+	uhash := sha256.Sum256([]byte(username))
+	phash := sha256.Sum256([]byte(password))
+
+	hash := make([]byte, 0)
+	hash = append(hash, uhash[:]...)
+	hash = append(hash, phash[:]...)
+
+	role, success := app.constants.Accounts[sha256.Sum256(hash)]
+
+	if success {
+		c.Set("role", role)
+		roleCookie := new(http.Cookie)
+		roleCookie.Name = "role"
+		roleCookie.Value = role
+		c.SetCookie(roleCookie)
 	}
 
-	if subtle.ConstantTimeCompare([]byte(username), app.constants.AdminUsername) == 1 &&
-		subtle.ConstantTimeCompare([]byte(password), app.constants.AdminPassword) == 1 {
-		return true, nil
-	}
-	return false, nil
+	return success, nil
 }
 
 // validateUUID middleware validates the UUID string format for a given set of params.

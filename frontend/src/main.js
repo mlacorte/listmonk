@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import VueCookies from 'vue-cookies';
 import Buefy from 'buefy';
 import VueI18n from 'vue-i18n';
 
@@ -15,6 +16,8 @@ const i18n = new VueI18n();
 Vue.use(Buefy, {});
 Vue.config.productionTip = false;
 
+Vue.use(VueCookies);
+
 // Globals.
 Vue.prototype.$utils = new Utils(i18n);
 Vue.prototype.$api = api;
@@ -27,6 +30,7 @@ new Vue({
 
   data: {
     isLoaded: false,
+    role: { [this.$cookies.get('role')]: true },
   },
 
   methods: {

@@ -223,7 +223,7 @@
               <b-icon icon="chart-bar" size="is-small" />
             </b-tooltip>
           </router-link>
-          <a href=""
+          <a href="" v-if="$root.role.admin"
             @click.prevent="$utils.confirm($t('campaigns.confirmDelete', { name: props.row.name }),
             () => deleteCampaign(props.row))" data-cy="btn-delete">
               <b-icon icon="trash-can-outline" size="is-small" />

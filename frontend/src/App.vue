@@ -33,7 +33,7 @@
                   icon="view-dashboard-variant-outline" :label="$t('menu.dashboard')">
                 </b-menu-item><!-- dashboard -->
 
-                <b-menu-item :expanded="activeGroup.lists"
+                <b-menu-item :expanded="activeGroup.lists" v-if="$root.role.admin"
                   :active="activeGroup.lists" data-cy="lists"
                   v-on:update:active="(state) => toggleGroup('lists', state)"
                   icon="format-list-bulleted-square" :label="$t('globals.terms.lists')">
@@ -46,7 +46,7 @@
                     icon="newspaper-variant-outline" :label="$t('menu.forms')"></b-menu-item>
                 </b-menu-item><!-- lists -->
 
-                <b-menu-item :expanded="activeGroup.subscribers"
+                <b-menu-item :expanded="activeGroup.subscribers" v-if="$root.role.admin"
                   :active="activeGroup.subscribers" data-cy="subscribers"
                   v-on:update:active="(state) => toggleGroup('subscribers', state)"
                   icon="account-multiple" :label="$t('globals.terms.subscribers')">
@@ -75,11 +75,11 @@
                     :active="activeItem.campaign" data-cy="new-campaign"
                     icon="plus" :label="$t('menu.newCampaign')"></b-menu-item>
 
-                  <b-menu-item :to="{name: 'media'}" tag="router-link"
+                  <b-menu-item :to="{name: 'media'}" tag="router-link" v-if="$root.role.admin"
                     :active="activeItem.media" data-cy="media"
                     icon="image-outline" :label="$t('menu.media')"></b-menu-item>
 
-                  <b-menu-item :to="{name: 'templates'}" tag="router-link"
+                  <b-menu-item :to="{name: 'templates'}" tag="router-link" v-if="$root.role.admin"
                     :active="activeItem.templates" data-cy="templates"
                     icon="file-image-outline" :label="$t('globals.terms.templates')"></b-menu-item>
 
@@ -88,7 +88,7 @@
                     icon="chart-bar" :label="$t('globals.terms.analytics')"></b-menu-item>
                 </b-menu-item><!-- campaigns -->
 
-                <b-menu-item :expanded="activeGroup.settings"
+                <b-menu-item :expanded="activeGroup.settings" v-if="$root.role.admin"
                   :active="activeGroup.settings" data-cy="settings"
                   v-on:update:active="(state) => toggleGroup('settings', state)"
                   icon="cog-outline" :label="$t('menu.settings')">
