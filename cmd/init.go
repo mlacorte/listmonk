@@ -73,8 +73,16 @@ type constants struct {
 	ForceSSL        bool   `koanf:"force_ssl"`
 	AdminUsername   []byte `koanf:"admin_username"`
 	AdminPassword   []byte `koanf:"admin_password"`
-	Editor1Username []byte `koanf:"editor1_username"`
-	Editor1Password []byte `koanf:"editor1_password"`
+	Admin2Username  []byte `koanf:"admin2_username"`
+	Admin2Password  []byte `koanf:"admin2_password"`
+	Admin3Username  []byte `koanf:"admin3_username"`
+	Admin3Password  []byte `koanf:"admin3_password"`
+	Admin4Username  []byte `koanf:"admin4_username"`
+	Admin4Password  []byte `koanf:"admin4_password"`
+	Admin5Username  []byte `koanf:"admin5_username"`
+	Admin5Password  []byte `koanf:"admin5_password"`
+	EditorUsername  []byte `koanf:"editor_username"`
+	EditorPassword  []byte `koanf:"editor_password"`
 	Editor2Username []byte `koanf:"editor2_username"`
 	Editor2Password []byte `koanf:"editor2_password"`
 	Editor3Username []byte `koanf:"editor3_username"`
@@ -338,7 +346,11 @@ func initConstants() *constants {
 
 	for _, account := range []account{
 		{username: c.AdminUsername, password: c.AdminPassword, role: "admin"},
-		{username: c.Editor1Username, password: c.Editor1Password, role: "editor"},
+		{username: c.Admin2Username, password: c.Admin2Password, role: "admin"},
+		{username: c.Admin3Username, password: c.Admin3Password, role: "admin"},
+		{username: c.Admin4Username, password: c.Admin4Password, role: "admin"},
+		{username: c.Admin5Username, password: c.Admin5Password, role: "admin"},
+		{username: c.EditorUsername, password: c.EditorPassword, role: "editor"},
 		{username: c.Editor2Username, password: c.Editor2Password, role: "editor"},
 		{username: c.Editor3Username, password: c.Editor3Password, role: "editor"},
 		{username: c.Editor4Username, password: c.Editor4Password, role: "editor"},
