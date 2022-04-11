@@ -60,7 +60,6 @@
           </footer>
         </div>
       </b-modal>
-
     </template>
 
     <!-- raw html editor //-->
@@ -78,6 +77,7 @@
       :id="id"
       :title="title"
       :contentType="form.format"
+      :templateId="templateId"
       :body="form.body"></campaign-preview>
 
     <!-- image picker -->
@@ -157,6 +157,10 @@ export default {
     title: String,
     body: String,
     contentType: String,
+    templateId: {
+      type: Number,
+      default: 0,
+    },
     disabled: Boolean,
   },
 
@@ -168,8 +172,8 @@ export default {
       isReady: false,
       isRichtextReady: false,
       isRichtextSourceVisible: false,
-      richtextConf: {},
       isTrackLink: false,
+      richtextConf: {},
       richTextSourceBody: '',
       form: {
         body: '',
@@ -199,6 +203,7 @@ export default {
 
         setup: (editor) => {
           editor.on('init', () => {
+            editor.focus();
             this.onEditorDialogOpen(editor);
           });
 
@@ -211,6 +216,7 @@ export default {
         },
 
         min_height: 500,
+        toolbar_sticky: true,
         entity_encoding: 'raw',
         convert_urls: true,
         plugins: [
@@ -247,6 +253,13 @@ export default {
     },
 
     onFormatChange(format) {
+      if (this.form.body.trim() === '') {
+        this.form.format = format;
+        this.onEditorChange();
+        return;
+      }
+
+      // Content isn't empty. Warn.
       this.$utils.confirm(
         this.$t('campaigns.confirmSwitchFormat'),
         () => {
@@ -362,7 +375,7 @@ export default {
 
     beautifyHTML(str) {
       // Pad all tags with linebreaks.
-      let s = this.trimLines(str.replace(/(<([^>]+)>)/ig, '\n$1\n'), true);
+      let s = this.trimLines(str.replace(/(<(?!(\/)?a|span)([^>]+)>)/ig, '\n$1\n'), true);
 
       // Remove extra linebreaks.
       s = s.replace(/\n+/g, '\n');
