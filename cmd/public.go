@@ -47,9 +47,13 @@ type publicTpl struct {
 	Description string
 }
 
-type unsubTpl struct {
+type updateTpl struct {
 	publicTpl
 	SubUUID        string
+	Email          string
+	AM             bool
+	PM             bool
+	Sponsored      bool
 	AllowBlocklist bool
 	AllowExport    bool
 	AllowWipe      bool
@@ -156,39 +160,49 @@ func handleViewCampaignMessage(c echo.Context) error {
 // campaigns link to.
 func handleSubscriptionPage(c echo.Context) error {
 	var (
-		app          = c.Get("app").(*App)
-		campUUID     = c.Param("campUUID")
-		subUUID      = c.Param("subUUID")
-		unsub        = c.Request().Method == http.MethodPost
-		blocklist, _ = strconv.ParseBool(c.FormValue("blocklist"))
-		out          = unsubTpl{}
+		app     = c.Get("app").(*App)
+		subUUID = c.Param("subUUID")
+		update  = c.Request().Method == http.MethodPost
+		out     = updateTpl{}
 	)
 	out.SubUUID = subUUID
-	out.Title = app.i18n.T("public.unsubscribeTitle")
+	out.Title = app.i18n.T("public.rtmSubscriptionTitle")
 	out.AllowBlocklist = app.constants.Privacy.AllowBlocklist
 	out.AllowExport = app.constants.Privacy.AllowExport
 	out.AllowWipe = app.constants.Privacy.AllowWipe
 
-	// Unsubscribe.
-	if unsub {
-		// Is blocklisting allowed?
-		if !app.constants.Privacy.AllowBlocklist {
-			blocklist = false
-		}
+	var sub models.RtmSubscriptions
+	if err := app.queries.GetRtmSubscriptions.Get(&sub, subUUID); err != nil {
+		app.log.Printf("GetRtmSubscriptions error: %v", err)
+		return c.Render(http.StatusInternalServerError, tplMessage,
+			makeMsgTpl(app.i18n.T("public.errorTitle"), "",
+				app.i18n.Ts("public.errorProcessingRequest")))
+	}
 
-		if _, err := app.queries.Unsubscribe.Exec(campUUID, subUUID, blocklist); err != nil {
-			app.log.Printf("error unsubscribing: %v", err)
+	out.Email = sub.Email
+	out.AM = sub.AM
+	out.PM = sub.PM
+	out.Sponsored = sub.Sponsored
+
+	// Update subscriptions.
+	if update {
+		am := c.FormValue("am") != ""
+		pm := c.FormValue("pm") != ""
+		sponsored := c.FormValue("sponsored") != ""
+
+		if _, err := app.queries.UpdateRtmSubscriptions.Exec(subUUID, am, pm, sponsored); err != nil {
+			app.log.Printf("UpdateRtmSubscriptions error: %v", err)
 			return c.Render(http.StatusInternalServerError, tplMessage,
 				makeMsgTpl(app.i18n.T("public.errorTitle"), "",
 					app.i18n.Ts("public.errorProcessingRequest")))
 		}
 
 		return c.Render(http.StatusOK, tplMessage,
-			makeMsgTpl(app.i18n.T("public.unsubbedTitle"), "",
-				app.i18n.T("public.unsubbedInfo")))
+			makeMsgTpl(app.i18n.T("public.rtmSubscriptionSuccess"), "",
+				app.i18n.T("public.rtmSubscriptionInfo")))
 	}
 
-	return c.Render(http.StatusOK, "subscription", out)
+	return c.Render(http.StatusOK, "rtm-subscription", out)
 }
 
 // handleOptinPage renders the double opt-in confirmation page that subscribers

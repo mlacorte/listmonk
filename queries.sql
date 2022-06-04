@@ -196,6 +196,132 @@ UPDATE subscriber_lists SET status = 'unsubscribed' WHERE
     -- If $3 is false, unsubscribe from the campaign's lists, otherwise all lists.
     CASE WHEN $3 IS FALSE THEN list_id = ANY(SELECT list_id FROM lists) ELSE list_id != 0 END;
 
+-- name: get-rtm-subscriptions
+-- Get subscriptions by user and tag
+-- $1 = subscribers.uuid
+WITH
+	subscriber AS (
+		SELECT id, email
+		FROM subscribers
+		WHERE uuid = $1
+	),
+	subscribed AS (
+		SELECT array_agg(list_id) AS lists
+		FROM subscriber_lists AS l, subscriber AS s
+		WHERE l.subscriber_id = s.id
+		AND l.status != 'unsubscribed'
+	),
+	am AS (
+		SELECT array_agg(id) AS lists
+		FROM lists
+		WHERE 'am' = ANY (tags)
+	),
+	pm AS (
+		SELECT array_agg(id) AS lists
+		FROM lists
+		WHERE 'pm' = ANY (tags)
+	),
+	sponsored AS (
+		SELECT array_agg(id) AS lists
+		FROM lists
+		WHERE 'sponsored' = ANY (tags)
+	)
+SELECT
+	subscriber.email,
+	COALESCE(am.lists && subscribed.lists, false) AS am,
+	COALESCE(pm.lists && subscribed.lists, false) AS pm,
+	COALESCE(sponsored.lists && subscribed.lists, false) AS sponsored
+FROM subscriber, am, pm, sponsored, subscribed;
+
+-- name: update-rtm-subscriptions
+-- Subscribe AM, PM, Sponsored subscriptions by user and tag
+-- $1 = subscribers.uuid
+-- $2 = bool (am)
+-- $3 = bool (pm)
+-- $4 = bool (sponsored)
+WITH
+	subscriber AS (
+		SELECT id
+		FROM subscribers
+		WHERE uuid = $1
+	),
+	amSubscribe AS (
+		INSERT INTO subscriber_lists (subscriber_id, list_id, status, updated_at)
+		SELECT subscriber.id, am.primary, 'unconfirmed', now()
+		FROM subscriber, (
+			SELECT id AS primary
+			FROM lists
+			WHERE 'am' = ANY (tags)
+			AND 'primary' = ANY (tags)
+		) AS am
+		WHERE true = $2
+		ON CONFLICT (subscriber_id, list_id)
+		DO UPDATE SET status = 'unconfirmed', updated_at = now()
+	),
+	pmSubscribe AS (
+		INSERT INTO subscriber_lists (subscriber_id, list_id, status, updated_at)
+		SELECT subscriber.id, pm.primary, 'unconfirmed', now()
+		FROM subscriber, (
+			SELECT id AS primary
+			FROM lists
+			WHERE 'pm' = ANY (tags)
+			AND 'primary' = ANY (tags)
+		) AS pm
+		WHERE true = $3
+		ON CONFLICT (subscriber_id, list_id)
+		DO UPDATE SET status = 'unconfirmed', updated_at = now()
+	),
+	sponsoredSubscribe AS (
+		INSERT INTO subscriber_lists (subscriber_id, list_id, status, updated_at)
+		SELECT subscriber.id, sponsored.primary, 'unconfirmed', now()
+		FROM subscriber, (
+			SELECT id AS primary
+			FROM lists
+			WHERE 'sponsored' = ANY (tags)
+			AND 'primary' = ANY (tags)
+		) AS sponsored
+		WHERE true = $4
+		ON CONFLICT (subscriber_id, list_id)
+		DO UPDATE SET status = 'unconfirmed', updated_at = now()
+	),
+	amUnsubscribe AS (
+		UPDATE subscriber_lists SET
+			status = 'unsubscribed', updated_at = now()
+		FROM subscriber, (
+			SELECT id
+			FROM lists
+			WHERE 'am' = ANY (tags) 
+		) AS am
+		WHERE false = $2
+		AND subscriber_id = subscriber.id
+		AND list_id = am.id
+	),
+	pmUnsubscribe AS (
+		UPDATE subscriber_lists SET
+			status = 'unsubscribed', updated_at = now()
+		FROM subscriber, (
+			SELECT id
+			FROM lists
+			WHERE 'pm' = ANY (tags) 
+		) AS pm
+		WHERE false = $3
+		AND subscriber_id = subscriber.id
+		AND list_id = pm.id
+	),
+	sponsoredUnsubscribe AS (
+		UPDATE subscriber_lists SET
+			status = 'unsubscribed', updated_at = now()
+		FROM subscriber, (
+			SELECT id
+			FROM lists
+			WHERE 'sponsored' = ANY (tags) 
+		) AS sponsored
+		WHERE false = $4
+		AND subscriber_id = subscriber.id
+		AND list_id = sponsored.id
+	)
+SELECT true;
+
 -- privacy
 -- name: export-subscriber-data
 WITH prof AS (

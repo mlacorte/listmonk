@@ -1,0 +1,70 @@
+{{ define "rtm-subscription" }}
+{{ template "header" .}}
+<section class="section">
+    <h2>{{ L.T "public.rtmSubscriptionTitle" }}</h2>
+    <p>{{ L.T "public.rtmSubscriptionHelp" }}</p>
+    <form method="post">
+        <div>
+            <p>
+                <input id="am-newsletter" type="checkbox" name="am" value="true" {{ if .Data.AM }}checked{{ end }}/>
+                <label for="am-newsletter">Resist the Mainstream AM</label>
+            </p>
+            <p>
+                <input id="pm-newsletter" type="checkbox" name="pm" value="true" {{ if .Data.PM }}checked{{ end }} />
+                <label for="pm-newsletter">Resist the Mainstream PM</label>
+            </p>
+            <p>
+                <input id="sponsored-newsletter" type="checkbox" name="sponsored" value="true" {{ if .Data.Sponsored }}checked{{ end }} />
+                <label for="sponsored-newsletter">Resist the Mainstream Sponsored</label>
+            </p>
+            <p>
+                <button type="submit" class="button" id="btn-unsub">{{ L.T "public.rtmSubscription" }}</button>
+            </p>
+        </div>
+    </form>
+</section>
+
+{{ if or .Data.AllowExport .Data.AllowWipe }}
+<form id="data-form" method="post" action="" onsubmit="return handleData()">
+    <section>
+        <h2>{{ L.T "public.privacyTitle" }}</h2>
+        {{ if .Data.AllowExport }}
+        <div class="row">
+            <input id="privacy-export" type="radio" name="data-action" value="export" required />
+            <label for="privacy-export"><strong>{{ L.T "public.privacyExport" }}</strong></label>
+            <br />
+            {{ L.T "public.privacyExportHelp" }}
+        </div>
+        {{ end }}
+
+        {{ if .Data.AllowWipe }}
+        <div class="row">
+            <input id="privacy-wipe" type="radio" name="data-action" value="wipe" required />
+            <label for="privacy-wipe"><strong>{{ L.T "public.privacyWipe" }}</strong></label>
+            <br />
+            {{ L.T "public.privacyWipeHelp" }}
+        </div>
+        {{ end }}
+        <p>
+            <input type="submit" value="{{ L.T "globals.buttons.continue" }}" class="button button-outline" />
+        </p>
+    </section>
+</form>
+<script>
+    function handleData() {
+        var a = document.querySelector('input[name="data-action"]:checked').value,
+            f = document.querySelector("#data-form");
+        if (a == "export") {
+            f.action = "/subscription/export/{{ .Data.SubUUID }}";
+            return true;
+        } else if (confirm("{{ L.T "public.privacyConfirmWipe" }}")) {
+            f.action = "/subscription/wipe/{{ .Data.SubUUID }}";
+            return true;
+        }
+        return false;
+    }
+</script>
+{{ end }}
+
+{{ template "footer" .}}
+{{ end }}

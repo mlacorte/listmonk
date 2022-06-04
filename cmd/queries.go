@@ -33,6 +33,10 @@ type Queries struct {
 	Unsubscribe                     *sqlx.Stmt `query:"unsubscribe"`
 	ExportSubscriberData            *sqlx.Stmt `query:"export-subscriber-data"`
 
+	// RTM queries
+	GetRtmSubscriptions    *sqlx.Stmt `query:"get-rtm-subscriptions"`
+	UpdateRtmSubscriptions *sqlx.Stmt `query:"update-rtm-subscriptions"`
+
 	// Non-prepared arbitrary subscriber queries.
 	QuerySubscribers                       string `query:"query-subscribers"`
 	QuerySubscribersCount                  string `query:"query-subscribers-count"`
