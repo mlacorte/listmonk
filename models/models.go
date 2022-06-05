@@ -272,10 +272,10 @@ type Bounce struct {
 
 // Data used for RTM subscription management
 type RtmSubscriptions struct {
-	Email     string `db:"email" json:"email"`
-	AM        bool   `db:"am" json:"am"`
-	PM        bool   `db:"pm" json:"pm"`
-	Sponsored bool   `db:"sponsored" json:"sponsored"`
+	Email  string `db:"email" json:"email"`
+	AM     bool   `db:"am" json:"am"`
+	PM     bool   `db:"pm" json:"pm"`
+	Offers bool   `db:"offers" json:"offers"`
 }
 
 // markdown is a global instance of Markdown parser and renderer.

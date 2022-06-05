@@ -53,7 +53,7 @@ type updateTpl struct {
 	Email          string
 	AM             bool
 	PM             bool
-	Sponsored      bool
+	Offers         bool
 	AllowBlocklist bool
 	AllowExport    bool
 	AllowWipe      bool
@@ -182,15 +182,15 @@ func handleSubscriptionPage(c echo.Context) error {
 	out.Email = sub.Email
 	out.AM = sub.AM
 	out.PM = sub.PM
-	out.Sponsored = sub.Sponsored
+	out.Offers = sub.Offers
 
 	// Update subscriptions.
 	if update {
 		am := c.FormValue("am") != ""
 		pm := c.FormValue("pm") != ""
-		sponsored := c.FormValue("sponsored") != ""
+		offers := c.FormValue("offers") != ""
 
-		if _, err := app.queries.UpdateRtmSubscriptions.Exec(subUUID, am, pm, sponsored); err != nil {
+		if _, err := app.queries.UpdateRtmSubscriptions.Exec(subUUID, am, pm, offers); err != nil {
 			app.log.Printf("UpdateRtmSubscriptions error: %v", err)
 			return c.Render(http.StatusInternalServerError, tplMessage,
 				makeMsgTpl(app.i18n.T("public.errorTitle"), "",

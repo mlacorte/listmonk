@@ -221,24 +221,24 @@ WITH
 		FROM lists
 		WHERE 'pm' = ANY (tags)
 	),
-	sponsored AS (
+	offers AS (
 		SELECT array_agg(id) AS lists
 		FROM lists
-		WHERE 'sponsored' = ANY (tags)
+		WHERE 'offers' = ANY (tags)
 	)
 SELECT
 	subscriber.email,
 	COALESCE(am.lists && subscribed.lists, false) AS am,
 	COALESCE(pm.lists && subscribed.lists, false) AS pm,
-	COALESCE(sponsored.lists && subscribed.lists, false) AS sponsored
-FROM subscriber, am, pm, sponsored, subscribed;
+	COALESCE(offers.lists && subscribed.lists, false) AS offers
+FROM subscriber, am, pm, offers, subscribed;
 
 -- name: update-rtm-subscriptions
--- Subscribe AM, PM, Sponsored subscriptions by user and tag
+-- Subscribe AM, PM, Offers subscriptions by user and tag
 -- $1 = subscribers.uuid
 -- $2 = bool (am)
 -- $3 = bool (pm)
--- $4 = bool (sponsored)
+-- $4 = bool (offers)
 WITH
 	subscriber AS (
 		SELECT id
@@ -271,15 +271,15 @@ WITH
 		ON CONFLICT (subscriber_id, list_id)
 		DO UPDATE SET status = 'unconfirmed', updated_at = now()
 	),
-	sponsoredSubscribe AS (
+	offersSubscribe AS (
 		INSERT INTO subscriber_lists (subscriber_id, list_id, status, updated_at)
-		SELECT subscriber.id, sponsored.primary, 'unconfirmed', now()
+		SELECT subscriber.id, offers.primary, 'unconfirmed', now()
 		FROM subscriber, (
 			SELECT id AS primary
 			FROM lists
-			WHERE 'sponsored' = ANY (tags)
+			WHERE 'offers' = ANY (tags)
 			AND 'primary' = ANY (tags)
-		) AS sponsored
+		) AS offers
 		WHERE true = $4
 		ON CONFLICT (subscriber_id, list_id)
 		DO UPDATE SET status = 'unconfirmed', updated_at = now()
@@ -308,17 +308,17 @@ WITH
 		AND subscriber_id = subscriber.id
 		AND list_id = pm.id
 	),
-	sponsoredUnsubscribe AS (
+	offersUnsubscribe AS (
 		UPDATE subscriber_lists SET
 			status = 'unsubscribed', updated_at = now()
 		FROM subscriber, (
 			SELECT id
 			FROM lists
-			WHERE 'sponsored' = ANY (tags) 
-		) AS sponsored
+			WHERE 'offers' = ANY (tags) 
+		) AS offers
 		WHERE false = $4
 		AND subscriber_id = subscriber.id
-		AND list_id = sponsored.id
+		AND list_id = offers.id
 	)
 SELECT true;
 

@@ -14,8 +14,8 @@
                 <label for="pm-newsletter">Resist the Mainstream PM</label>
             </p>
             <p>
-                <input id="sponsored-newsletter" type="checkbox" name="sponsored" value="true" {{ if .Data.Sponsored }}checked{{ end }} />
-                <label for="sponsored-newsletter">Resist the Mainstream Sponsored</label>
+                <input id="offers-newsletter" type="checkbox" name="offers" value="true" {{ if .Data.Offers }}checked{{ end }} />
+                <label for="offers-newsletter">Resist the Mainstream Offers</label>
             </p>
             <p>
                 <button type="submit" class="button" id="btn-unsub">{{ L.T "public.rtmSubscription" }}</button>
