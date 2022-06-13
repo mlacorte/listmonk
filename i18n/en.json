@@ -305,7 +305,7 @@
     "public.rtmSubscription": "Update",
     "public.rtmSubscriptionSuccess": "Success",
     "public.rtmSubscriptionTitle": "Update Subscriptions",
-    "public.rtmSubscriptionHelp": "Select which newsletters you'd like to be subscribed to.",
+    "public.rtmSubscriptionHelp": "Select which newsletters you'd like to be subscribed to:",
     "public.rtmSubscriptionInfo": "The changes you made to your subscriptions have been succesfully applied.",
     "public.unsubbedTitle": "Unsubscribed",
     "public.unsubscribeTitle": "Unsubscribe from mailing list",
